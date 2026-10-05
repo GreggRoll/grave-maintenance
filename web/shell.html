@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#10272d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Grave Maintenance — Night Crew</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#081318;color:#e4e4c9;font-family:system-ui,sans-serif;overscroll-behavior:none;touch-action:none}
+#canvas{display:block;width:100%;height:100%;outline:none;touch-action:none}
+#loading{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(ellipse at center,#1c3436,#081318);z-index:5}
+.card{max-width:580px;padding:32px;text-align:center}.eyebrow{font-size:12px;letter-spacing:4px;color:#ecb46e}h1{font-size:clamp(36px,7vw,66px);letter-spacing:-2px;line-height:1;margin:24px 0}p{color:#94aea6;line-height:1.6;font-size:16px}
+progress{appearance:none;width:100%;height:4px;border:0;background:#344e47;margin:22px 0}progress::-webkit-progress-bar{background:#344e47}progress::-webkit-progress-value{background:#ecb46e}progress::-moz-progress-bar{background:#ecb46e}.small{font-size:12px;color:#779389;letter-spacing:2px}
+button{background:#ecb46e;color:#10272d;border:0;border-radius:8px;padding:14px 24px;font:inherit;font-weight:700;cursor:pointer}
+</style>
+$GODOT_HEAD_INCLUDE
+</head>
+<body>
+<canvas id="canvas" tabindex="0" aria-label="Grave Maintenance game"></canvas>
+<div id="loading"><div class="card"><div class="eyebrow">BRIAR HOLLOW / NIGHT CREW</div><h1>GRAVE<br>MAINTENANCE</h1><p>An honest night's work.<br>A questionable workplace.</p><progress id="progress" max="100" value="0"></progress><div id="status" class="small">PREPARING YOUR SHIFT</div><p id="error"></p><button id="retry" hidden onclick="location.reload()">TRY AGAIN</button></div></div>
+<script src="$GODOT_URL"></script>
+<script>
+const config=$GODOT_CONFIG;
+config.canvas=document.getElementById('canvas');
+config.onProgress=(current,total)=>{if(total)document.getElementById('progress').value=current/total*100};
+const engine=new Engine(config);
+async function startShift(){
+  // Keep the public multiplayer endpoint separate from the exported game binary.
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),3000);
+  try{
+    const response=await fetch('server.json?v='+Date.now(),{cache:'no-store',signal:controller.signal});
+    if(response.ok){
+      const deployment=await response.json();
+      if(typeof deployment.server_url==='string' && /^wss?:\/\//.test(deployment.server_url))window.GRAVE_SERVER_URL=deployment.server_url;
+    }
+  }catch(error){console.info('Using the default multiplayer address.');}
+  finally{clearTimeout(timeout);}
+  await engine.startGame();
+}
+startShift().then(()=>{document.getElementById('loading').remove();document.getElementById('canvas').focus()}).catch(error=>{document.getElementById('status').textContent='COULD NOT LOAD THE SHIFT';document.getElementById('error').textContent=error.message||String(error);document.getElementById('retry').hidden=false});
+document.addEventListener('contextmenu',e=>e.preventDefault());
+</script>
+</body>
+</html>

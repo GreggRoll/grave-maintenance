@@ -1,0 +1,31 @@
+extends SceneTree
+
+func _initialize() -> void:
+	var sim := Simulation.new({"solo":{"name":"Test"}},[{"id":"m","owner":"solo","type":"push_mower"}])
+	assert(sim.map.graves.size() == 12)
+	assert(sim.map.cans.size() == 8)
+	assert(sim.state.equipment.m.returned)
+	var p: Dictionary = sim.state.players.solo
+	p.pos = Vector2(654,1300)
+	sim.interact(p)
+	assert(p.equipment == "m")
+	assert(not sim.state.equipment.m.returned)
+	p.pos = sim.map.grass[0]
+	sim.tick(0.1,{"solo":{"move":Vector2.RIGHT}})
+	assert(TaskSystem.progress(sim.state).mowing > 0)
+	p.pos = Vector2(630,1350)
+	EquipmentSystem.release(sim.state,p)
+	assert(sim.state.equipment.m.returned)
+	p.pos = Vector2(470,1300)
+	sim.tick(0.1,{"solo":{"extract":true}})
+	assert(sim.state.ended)
+	assert(sim.state.results.total > 0)
+	var dead := Simulation.new({"solo":{"name":"Test"}},[])
+	dead.kill("solo")
+	dead.tick(0.1,{})
+	assert(dead.state.results.total == 0)
+	assert(Catalog.clock(0) == "10:00 PM")
+	assert(Catalog.clock(120) == "12:00 AM")
+	assert(Catalog.clock(300) == "3:00 AM")
+	print("MILESTONE 1 PASS: mowing, collision map, recovery, extraction, payout, clock")
+	quit()

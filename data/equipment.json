@@ -1,0 +1,117 @@
+{
+  "push_mower": {
+    "name": "Push Mower",
+    "category": "mowing",
+    "tier": 1,
+    "price": 0,
+    "speed": 78,
+    "radius": 25,
+    "force": 0.45,
+    "description": "Narrow deck. Gentle on graves.",
+    "acceleration": 450
+  },
+  "gas_mower": {
+    "name": "Gas Mower",
+    "category": "mowing",
+    "tier": 2,
+    "price": 100,
+    "speed": 126,
+    "radius": 39,
+    "force": 0.85,
+    "description": "More grass. More momentum.",
+    "acceleration": 650
+  },
+  "zero_turn": {
+    "name": "Zero-Turn Mower",
+    "category": "mowing",
+    "tier": 3,
+    "price": 500,
+    "speed": 198,
+    "radius": 58,
+    "force": 1.4,
+    "description": "Huge deck. Watch those corners.",
+    "acceleration": 1600
+  },
+  "rake": {
+    "name": "Rake",
+    "category": "leaves",
+    "tier": 1,
+    "price": 0,
+    "speed": 105,
+    "radius": 42,
+    "rate": 33,
+    "noise": 0.6,
+    "description": "Slow, precise and almost silent."
+  },
+  "hand_blower": {
+    "name": "Handheld Blower",
+    "category": "leaves",
+    "tier": 2,
+    "price": 85,
+    "speed": 105,
+    "radius": 68,
+    "rate": 85,
+    "noise": 14,
+    "description": "Clear quickly. Pause to keep the noise down."
+  },
+  "backpack_blower": {
+    "name": "Backpack Blower",
+    "category": "leaves",
+    "tier": 3,
+    "price": 300,
+    "speed": 105,
+    "radius": 96,
+    "rate": 140,
+    "noise": 25,
+    "description": "Wide sweep. Loud enough to wake the dead."
+  },
+  "wagon": {
+    "name": "Wagon",
+    "category": "trash",
+    "tier": 2,
+    "price": 100,
+    "speed": 98,
+    "capacity": 2,
+    "protection": 0.55,
+    "force": 0.8,
+    "description": "Two bags. Cushions ordinary bumps."
+  },
+  "utility_cart": {
+    "name": "Utility Cart",
+    "category": "trash",
+    "tier": 3,
+    "price": 400,
+    "speed": 182,
+    "capacity": 4,
+    "protection": 0.8,
+    "force": 1.6,
+    "description": "Four bags. Fast trips. Terrible crashes."
+  },
+  "spray": {
+    "name": "Spray Bottle",
+    "category": "graves",
+    "tier": 1,
+    "price": 0,
+    "speed": 105,
+    "rate": 10,
+    "description": "One precise spray per click. Unlimited water."
+  },
+  "hose": {
+    "name": "Garden Hose",
+    "category": "graves",
+    "tier": 2,
+    "price": 125,
+    "speed": 105,
+    "rate": 23,
+    "description": "Hold the trigger. Stop near 100%."
+  },
+  "pressure_washer": {
+    "name": "Pressure Washer",
+    "category": "graves",
+    "tier": 3,
+    "price": 450,
+    "speed": 105,
+    "rate": 70,
+    "description": "Very fast. Over-cleaning wakes vampires."
+  }
+}
