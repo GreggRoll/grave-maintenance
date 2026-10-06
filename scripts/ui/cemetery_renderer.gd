@@ -17,7 +17,7 @@ func _process(dt: float) -> void:
 	visible = Session.screen == "match"
 	if visible:
 		var size := get_viewport_rect().size
-		zoom = 1.35 if size.x < 1000 else 1.15
+		zoom = (1.4 if size.y < 800 else 1.65) if input != null and input.touch_enabled else 1.15
 		var target := camera
 		if Session.state.players.has(Session.local_id):
 			var player: Dictionary = Session.state.players[Session.local_id]
@@ -30,7 +30,7 @@ func _process(dt: float) -> void:
 		var half_y := size.y / zoom / 2.0
 		var half_x := size.x / zoom / 2.0
 		target.x = clampf(target.x,minf(half_x,550),maxf(1100 - half_x,550))
-		var south_padding := 170.0 if size.x < 1000 else 0.0
+		var south_padding := 240.0 if input != null and input.touch_enabled else 0.0
 		target.y = clampf(target.y,minf(half_y,710),maxf(1420 + south_padding - half_y,710))
 		camera = camera.lerp(target,1.0 - exp(-dt * 7))
 		origin = size / 2.0 - camera * zoom
@@ -138,20 +138,25 @@ func _draw() -> void:
 	# Screen-space touch joystick stays readable as the camera moves.
 	draw_set_transform(Vector2.ZERO)
 	# Dark HUD backing and urgent edge pulses keep warnings readable over grass.
-	draw_rect(Rect2(16,14,275,200),Color(0.035,0.08,0.1,0.82))
-	draw_rect(Rect2(get_viewport_rect().size.x / 2 - 154,12,308,70),Color(0.035,0.08,0.1,0.8))
-	if state.players.has(Session.local_id):
-		var p: Dictionary = state.players[Session.local_id]
-		if not p.equipment.is_empty() or not p.bags.is_empty(): draw_rect(Rect2(16,225,355,170),Color(0.035,0.08,0.1,0.82))
+	var touch := input != null and input.touch_enabled
+	var view := get_viewport_rect().size
+	if touch:
+		var top := maxf(20,input.safe_top_css * input.safe_scale())
+		draw_rect(Rect2(16,top,view.x - 32,158),Color(0.035,0.08,0.1,0.90))
+		if view.y < 800: draw_rect(Rect2(320,view.y - 134,view.x - 590,104),Color(0.035,0.08,0.1,0.90))
+		else: draw_rect(Rect2(16,view.y - 368,view.x - 32,76),Color(0.035,0.08,0.1,0.90))
+	else:
+		draw_rect(Rect2(16,14,275,200),Color(0.035,0.08,0.1,0.82))
+		draw_rect(Rect2(view.x / 2 - 154,12,308,70),Color(0.035,0.08,0.1,0.8))
+		if state.players.has(Session.local_id):
+			var p: Dictionary = state.players[Session.local_id]
+			if not p.equipment.is_empty() or not p.bags.is_empty(): draw_rect(Rect2(16,225,355,170),Color(0.035,0.08,0.1,0.82))
 	if state.notice_time > 0 or state.elapsed >= 270:
-		draw_rect(Rect2(24,get_viewport_rect().size.y - 122,get_viewport_rect().size.x - 48,52),Color(0.08,0.07,0.06,0.84))
+		var notice_y: float = maxf(20,input.safe_top_css * input.safe_scale()) + 168 if touch and view.y < 800 else view.y - (448 if touch else 122)
+		draw_rect(Rect2(24,notice_y,view.x - 48,70 if touch else 52),Color(0.08,0.07,0.06,0.90))
 	if state.elapsed >= 295:
 		var color := Color(0.8,0.22,0.18,0.10 + absf(sin(time * 5)) * 0.14)
 		draw_rect(get_viewport_rect().grow(-8),color,false,18)
-	if input != null and input.touch_enabled and input.stick_id >= 0:
-		draw_circle(input.stick_origin,70,Color(0.9,0.9,0.8,0.12))
-		draw_arc(input.stick_origin,70,0,TAU,40,Color(0.9,0.9,0.8,0.4),3)
-		draw_circle(input.stick_origin + input.touch_move * 55,25,Color(0.9,0.9,0.8,0.4))
 
 func draw_grave(grave: Dictionary) -> void:
 	var p: Vector2 = grave.pos

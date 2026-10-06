@@ -8,7 +8,7 @@ static func spawn(state: Dictionary, kind: String, pos: Vector2, cause: String) 
 
 static func tick(state: Dictionary, map: Cemetery, dt: float, kill: Callable) -> void:
 	for monster in state.monsters:
-		if monster.kind not in ["ghost","witch"] and map.collides(monster.pos,12): monster.pos = map.free_position(monster.pos)
+		if monster.kind != "witch": monster.pos = map.monster_position(monster.pos,monster.kind == "ghost")
 		monster.age += dt
 		if monster.age < 1.5: continue
 		var target := ""
@@ -16,6 +16,7 @@ static func tick(state: Dictionary, map: Cemetery, dt: float, kill: Callable) ->
 		for id in state.players:
 			var p: Dictionary = state.players[id]
 			if not p.alive or p.extracted: continue
+			if monster.kind != "witch" and not Cemetery.GROUNDS.has_point(p.pos): continue
 			if monster.kind == "zombie" and not map.visible(monster.pos,p.pos) and monster.target != id: continue
 			var d: float = p.pos.distance_to(monster.pos)
 			if d < distance:
@@ -48,4 +49,5 @@ static func tick(state: Dictionary, map: Cemetery, dt: float, kill: Callable) ->
 			elif distance < 190 and phase >= 2.6: speed = 12.0
 		if monster.kind in ["ghost","witch"]: monster.pos += monster.direction * speed * dt
 		else: monster.pos = map.move_body(monster.pos,monster.direction * speed * dt,12)
+		if monster.kind != "witch": monster.pos = map.monster_position(monster.pos,monster.kind == "ghost")
 		if monster.pos.distance_to(p.pos) < 23: kill.call(target)

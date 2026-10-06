@@ -60,19 +60,36 @@ func run_controls() -> void:
 	assert(EquipmentSystem.lost_count(session.state) == 0)
 	# Touch drag direction and release go through the real controller.
 	main.input.touch_enabled = true
+	var layout: Dictionary = main.input.touch_layout()
 	var touch := InputEventScreenTouch.new()
 	touch.index = 0
-	touch.position = Vector2(100,400)
+	touch.position = layout.stick
 	touch.pressed = true
-	main.input._unhandled_input(touch)
+	root.push_input(touch,true)
 	var drag := InputEventScreenDrag.new()
 	drag.index = 0
-	drag.position = Vector2(200,400)
-	main.input._unhandled_input(drag)
+	drag.position = layout.stick + Vector2(90,0)
+	root.push_input(drag,true)
 	assert(main.input.packet().move == Vector2.RIGHT)
+	var use := InputEventScreenTouch.new()
+	use.index = 1
+	use.position = layout.use.get_center()
+	use.pressed = true
+	root.push_input(use,true)
+	var simultaneous: Dictionary = main.input.packet()
+	assert(simultaneous.move == Vector2.RIGHT and simultaneous.use and simultaneous.click)
+	# Releasing movement must stop it while the other finger keeps using the tool.
 	touch.pressed = false
-	main.input._unhandled_input(touch)
-	assert(main.input.packet().move == Vector2.ZERO)
+	root.push_input(touch,true)
+	var stopped: Dictionary = main.input.packet()
+	assert(stopped.move == Vector2.ZERO and stopped.use)
+	use.pressed = false
+	root.push_input(use,true)
+	assert(not main.input.packet().use)
+	# A lost browser focus cannot leave movement or the trigger stuck on.
+	root.push_input(touch,true)
+	main.input._notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	assert(main.input.packet().move == Vector2.ZERO and not main.input.held)
 	main.input.touch_enabled = false
 	p.pos = Vector2(470,1300)
 	main.extract_button.pressed.emit()

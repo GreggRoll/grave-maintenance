@@ -6,6 +6,7 @@ const TRAILER := Rect2(630, 1230, 250, 100)
 const EXTRACTION := Rect2(370, 1245, 185, 110)
 const BUILDING := Rect2(385, 55, 330, 150)
 const DUMPSTER := Rect2(765, 110, 125, 72)
+const GROUNDS := Rect2(25, 25, 1050, 1153)
 const CELL := 28
 var graves: Array = []
 var grass: Array = []
@@ -88,3 +89,13 @@ func free_position(p: Vector2, body_radius: float = 14.0) -> Vector2:
 			var candidate := p + Vector2.from_angle(i * TAU / 16) * radius
 			if not collides(candidate,body_radius): return candidate
 	return Vector2(550,1150)
+
+func monster_position(p: Vector2, phasing: bool = false) -> Vector2:
+	var inside := GROUNDS.grow(-14)
+	p = p.clamp(inside.position,inside.end)
+	if phasing or not collides(p,12): return p
+	for radius in range(20,301,20):
+		for i in 16:
+			var candidate := p + Vector2.from_angle(i * TAU / 16) * radius
+			if inside.has_point(candidate) and not collides(candidate,12): return candidate
+	return Vector2(550,1140)

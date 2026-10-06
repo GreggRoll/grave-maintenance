@@ -22,6 +22,7 @@ if __name__ == '__main__':
         run('--script', f'tests/milestone_{i}.gd')
     run('--script', 'tests/regressions.gd')
     run('--script', 'tests/controls.gd')
+    run('--script', 'tests/ui_boundaries.gd')
     if '--network' in os.sys.argv:
         code_file = Path('/tmp/grave_network_room.txt')
         code_file.unlink(missing_ok=True)

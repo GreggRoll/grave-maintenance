@@ -6,7 +6,7 @@ A playable Godot 4.6.2 / GDScript prototype for 1–4 employees. One compact cem
 
 Public game: **https://greggroll.github.io/grave-maintenance/**. Solo play is hosted on GitHub Pages. Co-op connects through a secure tunnel to this Mac; the Mac must remain awake and hosting must be running.
 
-The development build is served at **http://localhost:8080**. Select **I'm ready**, then **Clock in** for solo play. Basic tools are offered by default. The local WebSocket server runs on port **9080**.
+The development build is served at **http://localhost:8080**. Edit your name, then browse public games, host your own, join by code, or choose **Play solo**. In preparation, pack your tools, select **I'm ready**, then **Start shift**. Basics are packed by default. The local WebSocket server runs on port **9080**.
 
 On macOS, double-click **Play Grave Maintenance.command** to start the web game and co-op server again. Keep its terminal window open while playing. It reuses running services and finds Godot in PATH, the development download, or its cache; if needed it downloads Godot 4.6.2 from the official GitHub release.
 
@@ -38,15 +38,15 @@ After changing the game, export it with `tools/export_web.sh`, then run the publ
 
 | Action | Keyboard / mouse | Touch |
 |---|---|---|
-| Move | WASD or arrow keys | Drag the left side; release to stop |
-| Face | Mouse | Movement direction |
-| Take / enter equipment | Left click the nearby tool | Face the desired item; Use / Take |
+| Move | WASD or arrow keys | Drag the visible MOVE joystick; release to stop |
+| Face | Mouse | Movement direction, or tap the world to aim |
+| Take / enter equipment | Left click the nearby tool | Tap a nearby tool, or use Take |
 | Mow | Move while controlling the mower | Move while controlling the mower |
-| Rake / blow leaves | Hold left click | Hold Use |
+| Rake / blow leaves | Hold left click | Hold to clear |
 | Take a bag / deliver at dumpster | Left click | Use |
-| Spray | One left click per spray | One tap of Use per spray |
-| Hose / pressure washer | Hold left click | Hold Use |
-| Drop / exit / return tool | Right click | Drop / Return |
+| Spray | One left click per spray | Tap to spray |
+| Hose / pressure washer | Hold left click | Hold to wash |
+| Drop / exit / return tool | Right click | Contextual Drop, Exit, or Return tool |
 | Extract | Left click near truck or Extract button | Use near truck or Extract button |
 
 Equipment sits on the trailer south of the cemetery. Right click **inside the trailer's return area** to snap it back into storage. Returning tools does not extract you. Walk to the marked truck zone and intentionally extract. A warning allows leaving without all tools. Wagons/carts retain cargo when you exit; collect their bags at the northern dumpster before returning equipment.
@@ -64,6 +64,8 @@ The clock maps one real second to one in-game minute: 10 PM at start, midnight a
 
 Zombies pathfind around solid obstacles and persist after acquiring a player. Ghosts pass through obstacles and periodically vanish. Werewolves chase quickly with line-of-sight and last-seen memory. Vampires stalk, telegraph, then burst when nearby. Each standard monster has a mistake trigger. Witches are the scheduled deadline consequence. There are no weapons or damage-to-monster systems.
 
+Standard monsters are confined to the fenced cemetery, including ghosts. They cannot pursue or kill employees on the street/trailer side of the gate. A mistake on the road still wakes its monster inside the grounds. Witches can cross the boundary at 3 AM.
+
 ## Money and ownership
 
 `data/equipment.json` contains names, tiers, prices, capacities, work rates, sound, speeds, and risk values. `data/contract.json` contains the $1,000 maximum, $150 initial balance, and configurable 15% penalty per dead employee.
@@ -78,15 +80,15 @@ For the MVP, local saves are trusted. There are no account logins, cloud saves, 
 
 ## Co-op
 
-1. Connect to the WebSocket address in the lobby.
-2. Host a public room, or enter a password and host a locked room.
+1. The server browser connects automatically. Use Refresh to retry; custom addresses are under Connection settings.
+2. Choose Host a game, select Public or Private, and create it. Private games require a password.
 3. Other employees join a public listing or enter the room code and password.
-4. Offer/remove owned tools. Each card shows readiness, contribution names, and equipment value at risk.
+4. Trailer shows packed tools; My equipment shows ownership and Pack/Unpack controls; Shop groups upgrades by job and shows price, description, owned count, and remaining balance. Purchases stay at home until explicitly packed. Crew cards show readiness, contributions, and value at risk.
 5. Every employee must be ready. Only the room host can start. Any loadout change clears that employee's ready state.
 
 Private rooms are omitted from the public listing. Password hashes stay on the server. Rooms are limited to four employees and reject mid-shift joining. Host authority transfers when the host leaves a lobby. The dedicated server runs all task, collision, inventory-in-match, threat, death, extraction, and payout logic; clients send bounded movement/action intent. Snapshots run at 20 Hz, input at 30 Hz. Pickup actions are serialized to prevent double ownership.
 
-Internet hosting needs an accessible dedicated Godot server and an HTTPS site with a **WSS** reverse proxy. Set `window.GRAVE_SERVER_URL` in `web/shell.html` before starting the engine, or enter the deployed WSS address in the lobby. No remote hosting has been provisioned. Godot web clients cannot listen for incoming WebSockets, so browser co-op uses the supplied native dedicated server. See [Godot web export documentation](https://docs.godotengine.org/en/4.6/tutorials/export/exporting_for_web.html).
+The public deployment uses GitHub Pages plus the Mac's dedicated server behind a secure tunnel. `server.json` configures the WSS address separately from the game binary; custom addresses can also be entered under Connection settings. Browser co-op uses the supplied native dedicated server. See [Godot web export documentation](https://docs.godotengine.org/en/4.6/tutorials/export/exporting_for_web.html).
 
 ## Develop and test
 

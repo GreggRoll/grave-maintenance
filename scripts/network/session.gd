@@ -284,13 +284,13 @@ func toggle_offer(id: String) -> void:
 		offered.append(id)
 	update_loadout()
 
-func set_player_name(value: String) -> void:
+func set_player_name(value: String, notify: bool = true) -> void:
 	profile.name = value.strip_edges().left(18)
 	if profile.name.is_empty(): profile.name = "Groundskeeper"
 	ProfileStore.save_profile(profile,save_path)
-	update_loadout()
+	update_loadout(notify)
 
-func update_loadout() -> void:
+func update_loadout(notify: bool = true) -> void:
 	is_ready = false
 	if online and not room.is_empty(): command("loadout",{"offered":offered,"profile":profile})
-	else: changed.emit()
+	elif notify: changed.emit()
