@@ -69,7 +69,16 @@ def main():
     pack = HOST_CACHE / 'server.pck'
     if not pack.exists() or pack.read_bytes() != (ROOT / 'build/web/index.pck').read_bytes():
         shutil.copy2(ROOT / 'build/web/index.pck',pack)
-        if running(SERVER_JOB): subprocess.run(['launchctl','remove',SERVER_JOB],check=True)
+        if running(SERVER_JOB):
+            subprocess.run(['launchctl','remove',SERVER_JOB],check=True)
+            # launchctl removes the job before its old process has released the port.
+            # Do not mistake that retiring process for the replacement server.
+            for _ in range(40):
+                try:
+                    with socket.create_connection(('127.0.0.1',9080),timeout=.5): pass
+                except OSError: break
+                time.sleep(.25)
+            else: raise RuntimeError('Previous game server did not release port 9080.')
     try:
         with socket.create_connection(('127.0.0.1',9080),timeout=.5): pass
     except OSError:
